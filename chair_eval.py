@@ -35,7 +35,7 @@ parser.add_argument(
 parser.add_argument(
     "--data-path",
     type=str,
-    default="/path/to/COCO/val2014", # path
+    default="/home/baojiedama/val2014-chosen", # path
     help="data path",
 )
 parser.add_argument("--batch-size", type=int, default=1)
