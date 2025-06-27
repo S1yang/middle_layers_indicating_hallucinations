@@ -35,7 +35,7 @@ parser.add_argument(
 parser.add_argument(
     "--data-path",
     type=str,
-    default="/home/baojiedama/val2014-chosen", # path
+    default="/home/baojiedama/filtered_images", # path
     help="data path",
 )
 parser.add_argument("--batch-size", type=int, default=1)
@@ -110,10 +110,13 @@ for batch_id, data in tqdm(enumerate(coco_loader), total=len(coco_loader)):
     with torch.inference_mode():
         outputs = model_manager.llm_model.generate(
             input_ids,
-            do_sample=args.sample,
-            max_new_tokens=args.max_tokens,
+            do_sample=False,
+            max_new_tokens=100,
+            num_beams=1,
+            # temperature=0.0,
+            # top_k=1, 
+            # top_p=1.0,
             use_cache=True,
-            num_beams=args.beam,
             output_attentions=False,
             output_hidden_states=False,
             return_dict=True,
