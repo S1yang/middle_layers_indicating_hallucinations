@@ -35,7 +35,7 @@ parser.add_argument(
 parser.add_argument(
     "--data-path",
     type=str,
-    default="/home/baojiedama/filtered_images", # path
+    default="/home/baojiedama/val2014-chosen", # path
     help="data path",
 )
 parser.add_argument("--batch-size", type=int, default=1)
@@ -94,7 +94,7 @@ for batch_id, data in tqdm(enumerate(coco_loader), total=len(coco_loader)):
     image = data["image"]
 
     batch_size = img_id.shape[0]
-    query = ["Please help me describe the image in detail."] * batch_size
+    query = ["Please describe the image in detail."] * batch_size
     questions, input_ids, kwargs = model_manager.prepare_inputs_for_model(query, image, use_dataloader=True)
 
     if args.use_head_guide:
@@ -110,12 +110,19 @@ for batch_id, data in tqdm(enumerate(coco_loader), total=len(coco_loader)):
     with torch.inference_mode():
         outputs = model_manager.llm_model.generate(
             input_ids,
-            do_sample=False,
-            max_new_tokens=100,
-            num_beams=1,
-            # temperature=0.0,
-            # top_k=1, 
-            # top_p=1.0,
+            # 解码策略
+            do_sample=False,           # 贪心
+            num_beams=1,               # beam size=1
+            temperature=1.0,           # 温度
+            top_k=50,                  # top-k
+            top_p=1.0,                 # top-p
+            # typical_p=1.0,           # 若支持则加上
+            repetition_penalty=1.0,    # 重复惩罚
+            length_penalty=1.0,        # 长度惩罚
+            no_repeat_ngram_size=0,    # 禁止重复 n-gram
+
+            max_new_tokens=100,        # 与 HF 一致
+            
             use_cache=True,
             output_attentions=False,
             output_hidden_states=False,
